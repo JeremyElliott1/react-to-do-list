@@ -11,6 +11,23 @@ function App() {
   const [status, setStatus] = useState("all");
   const [filteredToDos, setFilteredToDos] = useState([]);
 
+  //only runs once on load.
+  useEffect(
+    () => {
+      getLocalTodos();
+    }
+    , ([])
+  );
+
+  //Use effect, that runs when there are state changes to 'todos' and 'status'
+  useEffect(
+    () => {
+      saveLocalTodos();
+      filterHandler();
+    }
+    , [todos, status]
+  )
+
   //functions
   const filterHandler = () => {
     switch (status) {
@@ -26,17 +43,23 @@ function App() {
     }
   }
 
-  useEffect(
-    () => {
-      filterHandler();
+  const saveLocalTodos = () => {
+      localStorage.setItem("todos", JSON.stringify(todos))
+  }
+
+  const getLocalTodos = () => {
+    if (localStorage.getItem('todos') === null) {
+      localStorage.setItem('todos', JSON.stringify([]));
+    } else {
+     let localTodos = JSON.parse(localStorage.getItem("todos", JSON.stringify(todos)));
+     setTodos(localTodos);
     }
-    , [todos, status]
-  )
+  }
 
   return (
     <div className='App'>
       <header>
-        <h1>To Do List:</h1>
+        <h1>To Do List :</h1>
       </header>
       <Form inputText={inputText} setInputText={setInputText} todos={todos} setTodos={setTodos} setStatus={setStatus} />
       <ToDoList todos={todos} setTodos={setTodos} filteredToDos={filteredToDos} />
